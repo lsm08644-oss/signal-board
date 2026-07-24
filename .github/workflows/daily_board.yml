@@ -1,1 +1,42 @@
-daily_board.yml
+name: 시그널 보드 매일 갱신
+
+on:
+  schedule:
+    # UTC 21:30 = 한국시간 06:30. 미국장 마감 후, 월~금.
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch:        # 깃허브 화면에서 손으로 즉시 돌릴 때
+
+permissions:
+  contents: write
+
+env:
+  TZ: Asia/Seoul            # 보드에 찍히는 시각을 한국시간으로
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: 라이브러리 설치
+        run: pip install yfinance pandas requests
+
+      # 절반 넘게 수집 실패하면 여기서 멈춥니다.
+      # 아래 커밋 단계로 넘어가지 않으니 어제 보드가 그대로 살아 있습니다.
+      - name: 보드 생성
+        run: |
+          mkdir -p docs
+          python build_board.py --out docs/index.html
+
+      - name: 결과 커밋
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html docs/last_market.json
+          git diff --staged --quiet || git commit -m "보드 갱신 $(date +'%Y-%m-%d')"
+          git push
