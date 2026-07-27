@@ -138,6 +138,204 @@ def pct(a, b):
     return round((a / b - 1) * 100, 1)
 
 
+# ─────────────────────────────────────────────────────────────
+# 종목 상세용 부가 데이터
+#   보드 채점에는 안 쓰이고, 상세 탭에서 근거를 보여주는 데만 씁니다.
+#   야후가 안 주는 항목은 조용히 비워 둡니다. 없으면 그 블록만 안 그립니다.
+# ─────────────────────────────────────────────────────────────
+def _pick(df, *names):
+    """손익계산서/현금흐름표에서 이름이 비슷한 행을 찾아 줍니다."""
+    if df is None or getattr(df, "empty", True):
+        return None
+    idx = {str(i).strip().lower(): i for i in df.index}
+    for want in names:
+        w = want.lower()
+        for k, orig in idx.items():
+            if k == w:
+                return df.loc[orig]
+    for want in names:
+        w = want.lower()
+        for k, orig in idx.items():
+            if w in k:
+                return df.loc[orig]
+    return None
+
+
+def _b(v):
+    """달러를 10억 단위로. 소수 둘째 자리."""
+    try:
+        if v is None or pd.isna(v):
+            return None
+        return round(float(v) / 1e9, 2)
+    except Exception:
+        return None
+
+
+def _label(ts, quarterly):
+    try:
+        t = pd.Timestamp(ts)
+    except Exception:
+        return str(ts)[:7]
+    return f"{t.year % 100:02d}.{(t.month - 1) // 3 + 1}Q" if quarterly else f"FY{t.year}"
+
+
+def _statement(df, quarterly, keys, limit):
+    """재무제표 DataFrame 을 오래된 것부터 정렬한 리스트로."""
+    if df is None or getattr(df, "empty", True):
+        return []
+    series = {k: _pick(df, *names) for k, names in keys.items()}
+    cols = list(df.columns)[:limit]
+    out = []
+    for c in reversed(cols):
+        rec = {"p": _label(c, quarterly)}
+        got = False
+        for k, s in series.items():
+            v = _b(s.get(c)) if s is not None and c in s.index else None
+            rec[k] = v
+            if v is not None:
+                got = True
+        if got:
+            out.append(rec)
+    return out
+
+
+def _estimates(tk, price, fwd_per):
+    """컨센서스 예상 매출·EPS. yfinance 버전에 따라 없을 수 있습니다."""
+    out = []
+    try:
+        rev = tk.revenue_estimate
+        eps = tk.earnings_estimate
+    except Exception:
+        return out
+    for tag, label in (("0y", "올해"), ("+1y", "내년")):
+        rec = {"p": label}
+        try:
+            if rev is not None and tag in rev.index:
+                rec["rev"] = _b(rev.loc[tag].get("avg"))
+                g = rev.loc[tag].get("growth")
+                rec["revG"] = round(float(g) * 100, 1) if g is not None and not pd.isna(g) else None
+        except Exception:
+            pass
+        try:
+            if eps is not None and tag in eps.index:
+                e = eps.loc[tag].get("avg")
+                rec["eps"] = round(float(e), 2) if e is not None and not pd.isna(e) else None
+                g = eps.loc[tag].get("growth")
+                rec["epsG"] = round(float(g) * 100, 1) if g is not None and not pd.isna(g) else None
+        except Exception:
+            pass
+        # 지금 배수를 그대로 유지한다고 볼 때의 주가
+        if rec.get("eps") and fwd_per and fwd_per > 0:
+            rec["px"] = round(rec["eps"] * fwd_per, 2)
+            rec["pxGap"] = pct(rec["px"], price)
+        if any(rec.get(k) is not None for k in ("rev", "eps")):
+            out.append(rec)
+    return out
+
+
+def fetch_valuation(info, hist, price, mcap, est):
+    """밸류 비교 표 전용 지표. 채점에는 쓰이지 않습니다."""
+    v = {}
+    try:
+        cl = hist["Close"]
+        this_year = cl[cl.index.year == datetime.now().year]
+        if len(this_year) and price:
+            v["ytd"] = round((price / float(this_year.iloc[0]) - 1) * 100, 1)
+    except Exception:
+        pass
+
+    def put(key, src, nd=2, mul=1):
+        x = info.get(src)
+        if x is not None:
+            try:
+                v[key] = round(float(x) * mul, nd)
+            except Exception:
+                pass
+
+    put("per",  "trailingPE")
+    put("psr",  "priceToSalesTrailing12Months")
+    put("ev",   "enterpriseToEbitda")
+    put("gross", "grossMargins",     1, 100)
+    put("op",    "operatingMargins", 1, 100)
+    put("net",   "profitMargins",    1, 100)
+
+    fcf = info.get("freeCashflow")
+    if fcf and mcap:
+        try:
+            v["pfcf"] = round(mcap / float(fcf), 2)
+        except Exception:
+            pass
+
+    # 예상 매출 기준 PSR — 컨센서스가 있을 때만
+    try:
+        rev = next((e.get("rev") for e in (est or []) if e.get("rev")), None)
+        if rev and mcap:
+            v["fpsr"] = round(mcap / (rev * 1e9), 2)
+    except Exception:
+        pass
+    return v
+
+
+def fetch_detail(tk, info, hist, price, fwd_per, per3y, ma200):
+    d = {
+        "name": info.get("longName") or info.get("shortName"),
+        "sector": info.get("sector"),
+        "per3y": per3y,
+        "ma200": round(ma200, 2) if ma200 else None,
+    }
+
+    for src, dst, mul in (("returnOnAssets", "roa", 100),
+                          ("returnOnEquity", "roe", 100),
+                          ("operatingMargins", "opm", 100),
+                          ("profitMargins", "npm", 100),
+                          ("targetMeanPrice", "target", 1)):
+        v = info.get(src)
+        if v is not None:
+            try:
+                d[dst] = round(float(v) * mul, 2 if mul == 1 else 1)
+            except Exception:
+                pass
+    if d.get("target") and price:
+        d["targetGap"] = pct(d["target"], price)
+    if info.get("numberOfAnalystOpinions"):
+        d["targetN"] = int(info["numberOfAnalystOpinions"])
+
+    # 최근 1년 주가 — 주봉으로 줄여 담습니다. 일봉이면 파일이 다섯 배가 됩니다.
+    try:
+        close = hist["Close"].tail(260)
+        wk = close.resample("W-FRI").last().dropna()
+        d["px"] = [round(float(v), 2) for v in wk.tolist()][-53:]
+        d["pxFrom"] = str(wk.index[-53:][0].date())
+        d["hi52"] = round(float(close.max()), 2)
+        d["lo52"] = round(float(close.min()), 2)
+    except Exception:
+        pass
+
+    try:
+        d["q"] = _statement(tk.quarterly_income_stmt, True,
+                            {"rev": ("Total Revenue", "Revenue"),
+                             "ni": ("Net Income", "Net Income Common Stockholders")}, 8)
+    except Exception:
+        d["q"] = []
+    try:
+        d["y"] = _statement(tk.income_stmt, False,
+                            {"rev": ("Total Revenue", "Revenue"),
+                             "op": ("Operating Income", "EBIT"),
+                             "ni": ("Net Income", "Net Income Common Stockholders")}, 4)
+    except Exception:
+        d["y"] = []
+    try:
+        d["cf"] = _statement(tk.cashflow, False,
+                             {"ocf": ("Operating Cash Flow",),
+                              "capex": ("Capital Expenditure",),
+                              "fcf": ("Free Cash Flow",)}, 4)
+    except Exception:
+        d["cf"] = []
+
+    d["est"] = _estimates(tk, price, fwd_per)
+    return {k: v for k, v in d.items() if v not in (None, [], {})}
+
+
 def fetch_one(ticker: str, theme: str, hist_period: str = "4y"):
     tk = yf.Ticker(ticker)
     info = tk.info or {}
@@ -177,6 +375,7 @@ def fetch_one(ticker: str, theme: str, hist_period: str = "4y"):
     mcap_b = round(mcap / 1e9, 1) if mcap else None
 
     per3y = PER3Y_OVERRIDE.get(ticker) or per3y_from_history(tk, hist)
+    detail = fetch_detail(tk, info, hist, price, fwd_per, per3y, ma200)
 
     return {
         "종목": ticker,
@@ -191,6 +390,8 @@ def fetch_one(ticker: str, theme: str, hist_period: str = "4y"):
         "RSI": rsi_wilder(close),
         "부채비율": debt,
         "_3Y평균PER(근사)": per3y,
+        "_detail": detail,
+        "_valu": fetch_valuation(info, hist, price, mcap, detail.get("est")),
     }
 
 
@@ -208,6 +409,18 @@ def fetch_market():
         out["VIX"] = round(float(vix.iloc[-1]), 2)
     except Exception:
         out["VIX"] = None
+
+    # 상세 탭의 시장 환경 표에만 쓰이는 지수들
+    idx = {}
+    for sym, key in (("^IXIC", "NASDAQ"), ("^GSPC", "S&P500")):
+        try:
+            h = yf.Ticker(sym).history(period="1y")["Close"]
+            now, hi = float(h.iloc[-1]), float(h.max())
+            idx[key] = {"now": round(now, 1), "hi": round(hi, 1),
+                        "dd": round((now / hi - 1) * 100, 1)}
+        except Exception:
+            pass
+    out["_indices"] = idx
     return out
 
 

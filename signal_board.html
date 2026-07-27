@@ -306,6 +306,74 @@
   @media (prefers-reduced-motion:reduce){
     *{transition:none!important;animation:none!important}
   }
+  /* ---------- detail: 확장 섹션 ---------- */
+  .dt-nav{display:flex;gap:2px;flex-wrap:wrap;margin:20px 0 2px;border-bottom:1px solid var(--line)}
+  .dt-nav button{
+    background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);
+    font-family:var(--sans);font-size:13px;font-weight:600;padding:8px 13px;cursor:pointer;
+    display:flex;align-items:baseline;gap:6px;
+  }
+  .dt-nav button:hover{color:var(--text)}
+  .dt-nav button.on{color:var(--text);border-bottom-color:var(--buy)}
+  .dt-nav button i{font-family:var(--mono);font-style:normal;font-size:10px;color:var(--dimmer)}
+  .dt-nav button.on i{color:var(--buy)}
+
+  .dsec{margin-top:24px;scroll-margin-top:12px}
+  .dsec-h{display:flex;align-items:baseline;gap:10px;margin-bottom:11px;flex-wrap:wrap}
+  .dsec-h .no{font-family:var(--mono);font-size:11px;color:var(--dimmer);letter-spacing:.06em}
+  .dsec-h .ti{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+  .dsec-h .sb{font-size:12px;color:var(--dim)}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:14px 16px}
+  .card + .card{margin-top:11px}
+  .card h4{margin:0 0 10px;font-size:12px;font-weight:700;color:var(--dim);letter-spacing:.02em}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px;align-items:start}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+
+  .kv{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+      padding:7px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+  .kv:last-child{border-bottom:0}
+  .kv span{color:var(--dim)}
+  .kv b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;font-size:13.5px}
+
+  .ftab{width:100%;border-collapse:collapse;font-size:12px}
+  .ftab th,.ftab td{padding:6px 7px;text-align:right;border-bottom:1px solid var(--line-soft);
+    font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .ftab th:first-child,.ftab td:first-child{text-align:left;font-family:var(--sans);color:var(--dim);font-size:12px}
+  .ftab thead th{color:var(--dim);font-weight:600;border-bottom-color:var(--line)}
+  .ftab tr:last-child td{border-bottom:0}
+  .tscroll{overflow-x:auto}
+
+  .cmt{font-size:13.5px;line-height:1.8}
+  .cmt em{font-style:normal;color:var(--buy);font-weight:600}
+  .cmt em.neg{color:var(--sell)}
+  .none{font-size:12.5px;color:var(--dimmer);padding:6px 0}
+  .lgd{display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:8px;flex-wrap:wrap}
+  .lgd i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+  /* ---------- 밸류 비교 표 ---------- */
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .seg button{background:none;border:0;color:var(--dim);font-family:var(--sans);font-size:12px;
+    font-weight:600;padding:5px 12px;cursor:pointer}
+  .seg button.on{background:var(--panel-2);color:var(--text)}
+  .vwrap{border:1px solid var(--line);border-radius:9px;overflow:auto;background:var(--panel);max-height:72vh}
+  table.vtab{width:100%;border-collapse:separate;border-spacing:0;min-width:1180px;font-size:12px}
+  table.vtab th{position:sticky;top:0;z-index:2;background:var(--panel-2);color:var(--dim);
+    font-size:11px;font-weight:600;text-align:right;padding:8px 8px;white-space:nowrap;
+    border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+  table.vtab th:hover{color:var(--text)}
+  table.vtab th.on{color:var(--text)}
+  table.vtab th .sm{font-size:9px;margin-left:3px;color:var(--buy)}
+  table.vtab th:first-child,table.vtab th:nth-child(2){text-align:left}
+  table.vtab td{padding:6px 8px;text-align:right;white-space:nowrap;
+    border-bottom:1px solid var(--line-soft);
+    font-family:var(--mono);font-variant-numeric:tabular-nums}
+  table.vtab td.sans,table.vtab td.tk{font-family:var(--sans)}
+  table.vtab td:first-child,table.vtab td:nth-child(2){text-align:left}
+  table.vtab td.sans{color:var(--dim);font-size:11.5px}
+  table.vtab tbody tr{cursor:pointer}
+  table.vtab tbody tr:hover td{background:rgba(255,255,255,.035)}
+  .vcap{font-size:11.5px;color:var(--dimmer);margin-top:9px;line-height:1.7}
 </style>
 
 <div class="wrap">
@@ -381,24 +449,88 @@
     <div class="dt-id" id="dtId"></div>
     <div class="dt-verdict" id="dtVerdict"></div>
   </div>
-  <div class="strips" id="dtStrips"></div>
-  <div class="peers" id="dtPeers"></div>
+
+  <nav class="dt-nav" id="dtNav">
+    <button data-sec="dsJudge" class="on"><i>01</i>판단</button>
+    <button data-sec="dsValue"><i>02</i>가치</button>
+    <button data-sec="dsPerf"><i>03</i>실적</button>
+    <button data-sec="dsFin"><i>04</i>재무</button>
+    <button data-sec="dsFcst"><i>05</i>전망</button>
+  </nav>
+
+  <div class="dsec" id="dsJudge">
+    <div class="dsec-h"><span class="no">01</span><span class="ti">종합 판단</span>
+      <span class="sb">9개 지표 합산 점수 · 근거 · 주가 · 시장 환경</span></div>
+    <div class="card"><h4>왜 이 점수인가</h4><div class="cmt" id="dtCmt"></div></div>
+    <div class="strips" id="dtStrips"></div>
+    <div class="grid2" style="margin-top:11px">
+      <div class="card"><h4>주가 추이 · 최근 1년</h4><div id="dtChart"></div></div>
+      <div class="card"><h4>시장 환경 · 전 종목 공통</h4><div id="dtMkt"></div></div>
+    </div>
+    <div class="peers" id="dtPeers"></div>
+  </div>
+
+  <div class="dsec" id="dsValue">
+    <div class="dsec-h"><span class="no">02</span><span class="ti">밸류에이션</span>
+      <span class="sb">가격 대비 가치, 그리고 사업의 질</span></div>
+    <div class="grid2">
+      <div class="card"><h4>밸류에이션</h4><div id="dtVal"></div></div>
+      <div class="card"><h4>수익성</h4><div id="dtProf"></div></div>
+    </div>
+  </div>
+
+  <div class="dsec" id="dsPerf">
+    <div class="dsec-h"><span class="no">03</span><span class="ti">실적 추이</span>
+      <span class="sb">분기별 매출 · 순이익</span></div>
+    <div class="card"><div id="dtQ"></div></div>
+  </div>
+
+  <div class="dsec" id="dsFin">
+    <div class="dsec-h"><span class="no">04</span><span class="ti">재무제표</span>
+      <span class="sb">연도별 손익계산서 · 현금흐름표</span></div>
+    <div class="grid2">
+      <div class="card"><h4>연도별 실적</h4><div class="tscroll" id="dtY"></div></div>
+      <div class="card"><h4>연도별 현금흐름</h4><div class="tscroll" id="dtCF"></div></div>
+    </div>
+  </div>
+
+  <div class="dsec" id="dsFcst">
+    <div class="dsec-h"><span class="no">05</span><span class="ti">실적 전망</span>
+      <span class="sb">컨센서스 예상 실적과 그에 따른 주가</span></div>
+    <div class="card"><div class="tscroll" id="dtEst"></div></div>
+  </div>
 </div>
 
 <div id="view-value" hidden>
   <div class="vc-bar">
-    <label for="vcX">가로축</label>
-    <select class="f" id="vcX"></select>
-    <label for="vcY" style="margin-left:8px">세로축</label>
-    <select class="f" id="vcY"></select>
-    <label for="vcTheme" style="margin-left:8px">테마</label>
+    <div class="seg" id="vcMode">
+      <button data-m="table" class="on">밸류 표</button>
+      <button data-m="plot">산점도</button>
+    </div>
+    <label for="vcTheme" style="margin-left:10px">테마</label>
     <select class="f" id="vcTheme"></select>
+    <span id="vcAxes" hidden>
+      <label for="vcX" style="margin-left:8px">가로축</label>
+      <select class="f" id="vcX"></select>
+      <label for="vcY" style="margin-left:8px">세로축</label>
+      <select class="f" id="vcY"></select>
+    </span>
     <span style="flex:1"></span>
-    <span class="hint" style="font-size:11px;color:var(--dimmer)">원 크기 = 시가총액 · 색 = 판단</span>
+    <span class="hint" id="vcHint" style="font-size:11px;color:var(--dimmer)"></span>
   </div>
+
+  <div id="vcTableBox">
+    <div class="vwrap"><table class="vtab" id="vcTable"></table></div>
+    <div class="vcap">클릭 정렬 · Shift+클릭 다중정렬 · 행을 누르면 종목 상세로 이동합니다.<br>
+      색: 3Y괴리 음수는 저평가(초록) · GROSS 40% 이상 · OP 20% 이상 · PROFIT 10% 이상이면 초록,
+      각 기준의 절반 미만이면 빨강입니다. 적자 기업은 PER·PSR 계산이 성립하지 않아 값이 튈 수 있습니다.</div>
+  </div>
+
+  <div id="vcPlotBox" hidden>
   <div class="vc-plot"><svg id="vcPlot" preserveAspectRatio="none"></svg></div>
   <div class="vc-legend" id="vcLegend"></div>
   <div class="vc-quad" id="vcQuad"></div>
+  </div>
 </div>
 
   <footer class="note">
@@ -486,7 +618,8 @@ let S = {
   rows: clone(SEED),
   sort: [{k:'score', dir:-1}],
   fTheme:'', fBand:'', open:null, asOf:null, asOfISO:null,
-  view:'board', dtPick:null, vcX:'fwdPer', vcY:'eps', vcTheme:'',
+  view:'board', dtPick:null, vcMode:'table', vcSort:[],
+  vcX:'fwdPer', vcY:'eps', vcTheme:'',
 };
 const KEY = 'signalboard:v1';
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
@@ -521,8 +654,8 @@ let saveTimer;
 function save(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async ()=>{
-    const {rules,mktRules,market,rows,sort,fTheme,fBand,asOf} = S;
-    try{ await window.storage.set(KEY, JSON.stringify({rules,mktRules,market,rows,sort,fTheme,fBand,asOf})); }
+    const {rules,mktRules,market,rows,sort,fTheme,fBand,asOf,vcMode,vcSort} = S;
+    try{ await window.storage.set(KEY, JSON.stringify({rules,mktRules,market,rows,sort,fTheme,fBand,asOf,vcMode,vcSort})); }
     catch(e){ /* 로컬 파일로 열었을 때는 저장 불가 — 내보내기 사용 */ }
   }, 400);
 }
@@ -1183,10 +1316,413 @@ function renderDetail(all){
         <div class="pbar"><i style="left:${l}%;width:${Math.max(w,1.2)}%;background:${p._b.color}"></i></div>
         <span style="color:${p._b.color};text-align:right">${sgn(p.score)}</span></div>`;
     }).join('');
+
+  renderDetailExtra(r);
+  wireDetailNav();
+}
+
+/* ============================================================
+   종목 상세 — 확장 섹션
+   보드 채점에는 관여하지 않습니다. 점수의 근거를 눈으로 확인하는 용도입니다.
+   야후가 값을 안 준 블록은 "자료 없음"으로 조용히 비웁니다.
+   ============================================================ */
+
+const NONE = t => `<div class="none">${t}</div>`;
+const bil = v => v===null||v===undefined ? '—'
+  : (Math.abs(v)>=1000 ? (v/1000).toFixed(2)+'T' : v.toFixed(v>=100?0:1)+'B');
+const pc1 = v => v===null||v===undefined ? '—' : (v>0?'+':'')+v.toFixed(1)+'%';
+
+/* --- 01 코멘트: 점수 구성을 그대로 문장으로 옮깁니다 --- */
+function dtComment(r){
+  const p = r._s.parts, put = [], neg = [];
+  const add = (cond, txt, arr) => { if(cond) arr.push(txt); };
+  const A = v => Math.abs(v).toFixed(1) + '%';
+
+  add(p.dd>=2, `고점 대비 ${pc1(num(r.dd))} 낙폭`, put);
+  add(p.dd===0 && num(r.dd)!==null, `고점 부근(${pc1(num(r.dd))})`, neg);
+
+  const pg = effPerGap(r);
+  add(p.perGap>=1,  `선행 PER이 3년 평균보다 ${A(pg)} 낮음`, put);
+  add(p.perGap<=-1, `선행 PER이 3년 평균보다 ${A(pg)} 높음`, neg);
+
+  add(p.maGap>=1,  `200일선 ${A(num(r.maGap))} 아래`, put);
+  add(p.maGap<=-1, `200일선 ${A(num(r.maGap))} 위`, neg);
+
+  add(p.eps>=1,  `이익 성장 전망 ${pc1(num(r.eps))}`, put);
+  add(p.eps<=-1, `이익 성장 전망 ${pc1(num(r.eps))}`, neg);
+
+  add(p.debt===1, `부채비율 ${num(r.debt)}배로 가벼움`, put);
+  add(num(r.debt)!==null && num(r.debt)>2, `부채비율 ${num(r.debt)}배로 무거움`, neg);
+
+  add(p.rsi===1,  `RSI ${num(r.rsi)} 과매도`, put);
+  add(p.rsi===-1, `RSI ${num(r.rsi)} 과열`, neg);
+
+  const mkt = r._s.mkt;
+  const mktTxt = mkt>=2 ? `시장 전반이 공포 구간이라 전 종목에 <em>${sgn(mkt)}점</em>이 공통으로 붙습니다.`
+             : mkt<=-2 ? `시장이 탐욕 구간이라 전 종목에서 <em class="neg">${sgn(mkt)}점</em>이 공통으로 깎입니다.`
+             : `시장 환경은 중립에 가까워 공통 가감점은 <em>${sgn(mkt)}점</em>입니다.`;
+
+  const L = [];
+  if(put.length) L.push(`<em>가점</em> &nbsp;${put.join(' · ')}`);
+  if(neg.length) L.push(`<em class="neg">감점</em> &nbsp;${neg.join(' · ')}`);
+  if(!put.length && !neg.length) L.push('점수를 움직인 항목이 없습니다. 모든 지표가 중립 구간입니다.');
+  L.push(mktTxt);
+  L.push(`종목 점수 <em>${sgn(r._s.own)}</em> + 시장 <em>${sgn(mkt)}</em> = <em>${sgn(r.score)}점</em> · 판단 <em>${r._b.name}</em>`);
+
+  const miss = ['dd','perGap','maGap','eps','rsi','debt']
+    .filter(k => (k==='perGap'?effPerGap(r):num(r[k]))===null)
+    .map(k => S.rules[k].label);
+  if(miss.length) L.push(`<span style="color:var(--dimmer);font-size:12.5px">야후가 ${miss.join(', ')} 값을 주지 않아 해당 항목은 0점 처리됐습니다. 실제보다 낮게 나올 수 있습니다.</span>`);
+
+  return L.join('<br>');
+}
+
+/* --- 01 주가 차트 --- */
+function dtPriceChart(r){
+  const d = r.d || {};
+  const px = d.px;
+  if(!px || px.length < 5) return NONE('주가 이력이 없습니다.');
+  const W=520, H=180, L=6, Rr=52, T=12, B=20;
+  const vals = px.slice();
+  const ma = num(d.ma200), hi = num(d.hi52), lo = num(d.lo52);
+  const all = vals.concat([ma,hi,lo].filter(v=>v!==null&&v!==undefined));
+  let mn = Math.min(...all), mx = Math.max(...all);
+  const pad = (mx-mn)*0.08 || 1; mn -= pad; mx += pad;
+  const x = i => L + i/(vals.length-1) * (W-L-Rr);
+  const y = v => T + (1-(v-mn)/(mx-mn)) * (H-T-B);
+
+  const line = vals.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
+  const area = line + `L${x(vals.length-1).toFixed(1)},${H-B}L${x(0).toFixed(1)},${H-B}Z`;
+  const last = vals[vals.length-1];
+  const up = last >= vals[0];
+  const col = up ? '#3FD696' : '#E4655C';
+
+  const ref = (v,label,dash,c) => v===null||v===undefined ? '' :
+    `<line x1="${L}" y1="${y(v).toFixed(1)}" x2="${W-Rr}" y2="${y(v).toFixed(1)}"
+       stroke="${c}" stroke-width="1" stroke-dasharray="${dash}" opacity=".75"/>
+     <text x="${W-Rr+4}" y="${(y(v)+3.5).toFixed(1)}" font-size="9.5" font-family='${C.mono}' fill="${c}">${label}</text>`;
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+    <defs><linearGradient id="pxg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${col}" stop-opacity=".22"/>
+      <stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    ${ref(hi,'52주고',  '2 3', C.dimmer)}
+    ${ref(ma,'200일선', '4 3', '#8FA3B5')}
+    ${ref(lo,'52주저',  '2 3', C.dimmer)}
+    <path d="${area}" fill="url(#pxg)"/>
+    <path d="${line}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linejoin="round"/>
+    <circle cx="${x(vals.length-1).toFixed(1)}" cy="${y(last).toFixed(1)}" r="3" fill="${col}"/>
+    <text x="${W-Rr+4}" y="${(y(last)+3.5).toFixed(1)}" font-size="10.5" font-weight="700"
+      font-family='${C.mono}' fill="${col}">$${last.toFixed(2)}</text>
+    <text x="${L}" y="${H-6}" font-size="9.5" font-family='${C.mono}' fill="${C.dimmer}">${d.pxFrom||'1년 전'}</text>
+    <text x="${W-Rr}" y="${H-6}" font-size="9.5" text-anchor="end" font-family='${C.mono}' fill="${C.dimmer}">오늘</text>
+  </svg>
+  <div class="lgd"><span>주봉 종가</span><span>점선 = 52주 고·저 / 200일선</span></div>`;
+}
+
+/* --- 01 시장 환경 --- */
+function dtMarketPanel(){
+  const p = marketParts(), idx = (INJECTED && INJECTED.indices) || {};
+  const row = (k,v,s) => `<div class="kv"><span>${k}</span><b>${v} <span style="color:${
+    s>0?'var(--buy)':s<0?'var(--sell)':'var(--dim)'}">${sgn(s)}</span></b></div>`;
+  let extra = '';
+  for(const [k,o] of Object.entries(idx)){
+    extra += `<div class="kv"><span>${k}</span><b>${o.now.toLocaleString()} <span style="color:${
+      o.dd<0?'var(--sell)':'var(--dim)'};font-size:12px">${pc1(o.dd)}</span></b></div>`;
+  }
+  return row('SPY 52주 고점대비', pc1(num(S.market.spy)), p.spy)
+       + row('VIX', num(S.market.vix)===null?'—':num(S.market.vix).toFixed(2), p.vix)
+       + row('F&G INDEX', num(S.market.fng)===null?'—':Math.round(num(S.market.fng)), p.fng)
+       + extra
+       + `<div class="kv" style="border-top:1px solid var(--line);margin-top:4px;padding-top:9px">
+            <span>전 종목 공통 가감점</span><b style="color:${marketScore()>0?'var(--buy)':marketScore()<0?'var(--sell)':'var(--dim)'}">${sgn(marketScore())}</b></div>`;
+}
+
+/* --- 02 밸류에이션 / 수익성 --- */
+function dtValuation(r){
+  const d = r.d || {};
+  const fwd = num(r.fwdPer), p3 = num(d.per3y), gap = effPerGap(r);
+  if(fwd===null && p3===null) return NONE('PER 자료가 없습니다. 적자이거나 ETF인 경우입니다.');
+  const bar = (label,v,max,c) => {
+    const w = v===null||!max ? 0 : Math.max(2, Math.min(100, v/max*100));
+    return `<div style="margin:9px 0 13px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim)">
+        <span>${label}</span><b style="font-family:var(--mono);color:var(--text)">${v===null?'—':v.toFixed(2)}</b></div>
+      <div style="height:7px;border-radius:4px;background:var(--panel-2);margin-top:5px;overflow:hidden">
+        <i style="display:block;height:100%;width:${w}%;background:${c}"></i></div></div>`;
+  };
+  const mx = Math.max(fwd||0, p3||0) * 1.15 || 1;
+  return bar('현재 선행 PER', fwd, mx, gap!==null && gap<0 ? 'var(--buy)' : 'var(--sell)')
+       + bar('3년 평균 PER (근사)', p3, mx, 'var(--hold)')
+       + `<div class="kv"><span>괴리</span><b style="color:${
+            gap===null?'var(--dim)':gap<0?'var(--buy)':'var(--sell)'}">${pc1(gap)}</b></div>`
+       + (d.target ? `<div class="kv"><span>애널리스트 목표주가${d.targetN?` · ${d.targetN}명`:''}</span><b>$${d.target.toFixed(2)} <span style="color:${
+            d.targetGap>0?'var(--buy)':'var(--sell)'};font-size:12px">${pc1(d.targetGap)}</span></b></div>` : '')
+       + `<div class="none" style="margin-top:6px">3년 평균 PER은 야후가 과거 선행 PER을 주지 않아 실적 PER로 근사한 값입니다.</div>`;
+}
+
+function dtProfit(r){
+  const d = r.d || {};
+  const rows = [['ROE','roe','%'],['ROA','roa','%'],['영업이익률','opm','%'],['순이익률','npm','%']]
+    .filter(([,k])=>d[k]!==undefined && d[k]!==null);
+  if(!rows.length && num(r.debt)===null) return NONE('수익성 자료가 없습니다.');
+  let h = rows.map(([label,k])=>`<div class="kv"><span>${label}</span><b style="color:${
+    d[k]>0?'var(--buy)':'var(--sell)'}">${pc1(d[k])}</b></div>`).join('');
+  if(num(r.debt)!==null) h += `<div class="kv"><span>부채비율 (Debt/Equity)</span><b style="color:${
+    num(r.debt)<=0.2?'var(--buy)':num(r.debt)>2?'var(--sell)':'var(--text)'}">${num(r.debt).toFixed(2)}배</b></div>`;
+  if(d.sector) h += `<div class="kv"><span>섹터</span><b style="font-family:var(--sans);font-size:12.5px">${d.sector}</b></div>`;
+  return h;
+}
+
+/* --- 03 분기 실적 --- */
+function dtQuarters(r){
+  const q = (r.d||{}).q;
+  if(!q || !q.length) return NONE('분기 실적 자료가 없습니다.');
+  const W=760, H=210, T=16, B=26, L=8;
+  const vals = q.flatMap(o=>[o.rev,o.ni]).filter(v=>v!==null&&v!==undefined);
+  if(!vals.length) return NONE('분기 실적 자료가 없습니다.');
+  const mx = Math.max(...vals, 0), mn = Math.min(...vals, 0);
+  const y = v => T + (1-(v-mn)/((mx-mn)||1)) * (H-T-B);
+  const slot = (W-L*2)/q.length, bw = Math.min(26, slot/2.6);
+  let bars='';
+  q.forEach((o,i)=>{
+    const cx = L + slot*i + slot/2;
+    [['rev','#3FD696',-1],['ni','#5AA9E6',1]].forEach(([k,c,side])=>{
+      const v=o[k]; if(v===null||v===undefined) return;
+      const y0=y(0), y1=y(v), top=Math.min(y0,y1), h=Math.max(1.5,Math.abs(y1-y0));
+      bars += `<rect x="${(cx+side*bw*0.55-bw/2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}"
+                 height="${h.toFixed(1)}" rx="1.5" fill="${c}" opacity=".85"><title>${o.p} ${k==='rev'?'매출':'순이익'} ${bil(v)}</title></rect>`;
+    });
+    bars += `<text x="${cx.toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="9.5"
+               font-family='${C.mono}' fill="${C.dimmer}">${o.p}</text>`;
+  });
+  const zero = `<line x1="${L}" y1="${y(0).toFixed(1)}" x2="${W-L}" y2="${y(0).toFixed(1)}" stroke="${C.line}" stroke-width="1"/>`;
+  const last = q[q.length-1];
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${zero}${bars}</svg>
+    <div class="lgd">
+      <span><i style="background:#3FD696"></i>매출</span>
+      <span><i style="background:#5AA9E6"></i>순이익</span>
+      <span style="margin-left:auto">최근 ${last.p} · 매출 ${bil(last.rev)} · 순이익 ${bil(last.ni)}</span>
+    </div>`;
+}
+
+/* --- 04 연도별 --- */
+function dtAnnual(r){
+  const y = (r.d||{}).y;
+  if(!y || !y.length) return NONE('연도별 실적 자료가 없습니다.');
+  const head = y.map(o=>`<th>${o.p}</th>`).join('');
+  const line = (label, key, fn) => `<tr><td>${label}</td>${
+    y.map(o=>`<td>${fn(o[key], o)}</td>`).join('')}</tr>`;
+  return `<table class="ftab"><thead><tr><th>항목</th>${head}</tr></thead><tbody>
+    ${line('매출','rev',bil)}
+    ${line('영업이익','op',bil)}
+    ${line('순이익','ni',bil)}
+    ${line('영업이익률','op',(v,o)=> v!==null&&o.rev ? pc1(v/o.rev*100) : '—')}
+  </tbody></table>`;
+}
+
+function dtCashflow(r){
+  const cf = (r.d||{}).cf;
+  if(!cf || !cf.length) return NONE('현금흐름 자료가 없습니다.');
+  const head = cf.map(o=>`<th>${o.p}</th>`).join('');
+  const line = (label,key) => `<tr><td>${label}</td>${cf.map(o=>`<td>${bil(o[key])}</td>`).join('')}</tr>`;
+  return `<table class="ftab"><thead><tr><th>항목</th>${head}</tr></thead><tbody>
+    ${line('영업현금흐름','ocf')}
+    ${line('CAPEX','capex')}
+    ${line('잉여현금흐름','fcf')}
+  </tbody></table>
+  <div class="none">야후 무료 데이터는 4개 연도까지만 제공합니다.</div>`;
+}
+
+/* --- 05 전망 --- */
+function dtForecast(r){
+  const d = r.d||{}, est = d.est;
+  const price = num(r.price);
+  if(!est || !est.length){
+    return d.target
+      ? `<div class="kv"><span>애널리스트 목표주가${d.targetN?` · ${d.targetN}명`:''}</span><b>$${d.target.toFixed(2)}</b></div>
+         <div class="kv"><span>현재가 대비</span><b style="color:${d.targetGap>0?'var(--buy)':'var(--sell)'}">${pc1(d.targetGap)}</b></div>
+         ${NONE('컨센서스 예상 실적은 이 종목에 대해 제공되지 않습니다.')}`
+      : NONE('예상 실적 자료가 없습니다.');
+  }
+  const head = est.map(o=>`<th>${o.p}</th>`).join('');
+  const line = (label,fn) => `<tr><td>${label}</td>${est.map(o=>`<td>${fn(o)}</td>`).join('')}</tr>`;
+  const fwd = num(r.fwdPer);
+  return `<table class="ftab"><thead><tr><th>항목</th>${head}</tr></thead><tbody>
+    ${line('예상 매출', o=>bil(o.rev))}
+    ${line('매출 성장', o=>pc1(o.revG))}
+    ${line('예상 EPS', o=>o.eps===undefined||o.eps===null?'—':'$'+o.eps.toFixed(2))}
+    ${line('EPS 성장', o=>pc1(o.epsG))}
+    ${line('현 배수 유지 시 주가', o=>o.px?'$'+o.px.toFixed(2):'—')}
+    ${line('현재가 대비', o=>o.pxGap===undefined?'—':`<span style="color:${o.pxGap>0?'var(--buy)':'var(--sell)'}">${pc1(o.pxGap)}</span>`)}
+  </tbody></table>
+  <div class="none">예상 주가 = 예상 EPS × 현재 선행 PER${fwd?` (${fwd.toFixed(2)}배)`:''}. 배수가 그대로 유지된다는 가정일 뿐, 목표주가가 아닙니다.</div>
+  ${d.target?`<div class="kv" style="margin-top:8px"><span>애널리스트 목표주가${d.targetN?` · ${d.targetN}명`:''}</span><b>$${d.target.toFixed(2)} <span style="color:${d.targetGap>0?'var(--buy)':'var(--sell)'};font-size:12px">${pc1(d.targetGap)}</span></b></div>`:''}`;
+}
+
+/* --- 묶어서 그리기 --- */
+function renderDetailExtra(r){
+  const set = (id,html) => { const el=document.getElementById(id); if(el) el.innerHTML = html; };
+  set('dtCmt',   dtComment(r));
+  set('dtChart', dtPriceChart(r));
+  set('dtMkt',   dtMarketPanel());
+  set('dtVal',   dtValuation(r));
+  set('dtProf',  dtProfit(r));
+  set('dtQ',     dtQuarters(r));
+  set('dtY',     dtAnnual(r));
+  set('dtCF',    dtCashflow(r));
+  set('dtEst',   dtForecast(r));
+
+  const d = r.d;
+  const id = document.getElementById('dtId');
+  if(d && d.name && id && !id.dataset.named){
+    const sub = id.querySelector('.sub');
+    if(sub) sub.insertAdjacentHTML('beforebegin',
+      `<div class="sub" style="color:var(--dim);margin-bottom:1px">${d.name}</div>`);
+  }
+}
+
+/* --- 섹션 이동 --- */
+function wireDetailNav(){
+  const nav = document.getElementById('dtNav');
+  if(!nav || nav.dataset.wired) return;
+  nav.dataset.wired = '1';
+  nav.querySelectorAll('button').forEach(b=>{
+    b.onclick = () => {
+      nav.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b));
+      const el = document.getElementById(b.dataset.sec);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    };
+  });
+}
+
+/* ============================================================
+   밸류 비교 — 섹터별 밸류에이션 표
+   ============================================================ */
+const VCOLS = [
+  { k:'t',      h:'종목',      w:64,  fmt:r=>r.t, cls:'tk' },
+  { k:'theme',  h:'테마',      w:92,  fmt:r=>r.theme||'—', sans:1 },
+  { k:'price',  h:'현재가',    w:82,  fmt:r=>vnum(r,'price','usd') },
+  { k:'mcap',   h:'시총',      w:76,  fmt:r=>num(r.mcap)===null?'—':fmt.mcap(num(r.mcap)) },
+  { k:'dd',     h:'52주↓',     w:72,  fmt:r=>vpct(num(r.dd)), tone:v=>v<0?'neg':'' },
+  { k:'ytd',    h:'YTD',       w:72,  fmt:r=>vpct(vg(r,'ytd')), tone:v=>v>0?'pos':v<0?'neg':'' },
+  { k:'psr',    h:'PSR',       w:66,  fmt:r=>vfix(vg(r,'psr')) },
+  { k:'fpsr',   h:'FWD PSR',   w:76,  fmt:r=>vfix(vg(r,'fpsr')) },
+  { k:'per',    h:'PER',       w:70,  fmt:r=>vfix(vg(r,'per')) },
+  { k:'fwdPer', h:'FWD PER',   w:78,  fmt:r=>vfix(num(r.fwdPer)) },
+  { k:'perGap', h:'3Y괴리',    w:76,  fmt:r=>vpct(effPerGap(r)), band:v=>v<0?'g':'r' },
+  { k:'ev',     h:'EV/EBITDA', w:88,  fmt:r=>vfix(vg(r,'ev')) },
+  { k:'pfcf',   h:'P/FCF',     w:74,  fmt:r=>vfix(vg(r,'pfcf')) },
+  { k:'gross',  h:'GROSS',     w:76,  fmt:r=>vpct(vg(r,'gross')), band:v=>v>=40?'g':v<20?'r':'' },
+  { k:'op',     h:'OP',        w:72,  fmt:r=>vpct(vg(r,'op')),    band:v=>v>=20?'g':v<10?'r':'' },
+  { k:'net',    h:'PROFIT',    w:76,  fmt:r=>vpct(vg(r,'net')),   band:v=>v>=10?'g':v<5?'r':'' },
+];
+
+const vg = (r,k) => { const v=(r.v||{})[k]; return v===undefined?null:num(v); };
+function vval(r,k){
+  if(k==='t') return r.t; if(k==='theme') return r.theme||'';
+  if(k==='perGap') return effPerGap(r);
+  if(['price','mcap','dd','fwdPer'].includes(k)) return num(r[k]);
+  return vg(r,k);
+}
+const vnum = (r,k,f) => num(r[k])===null ? '—' : fmt[f](num(r[k]));
+function vfix(v){
+  if(v===null||v===undefined) return '—';
+  const a = Math.abs(v);
+  if(a>=10000) return (v/1000).toFixed(0)+'k';
+  return a>=100 ? v.toFixed(0) : v.toFixed(2);
+}
+function vpct(v){
+  if(v===null||v===undefined) return '—';
+  const a = Math.abs(v);
+  if(a>=10000) return (v>0?'+':'')+(v/1000).toFixed(0)+'k%';
+  return (v>0?'+':'') + v.toFixed(1) + '%';
+}
+
+function renderValueTable(all){
+  const rows = all.slice();
+  const sorts = S.vcSort && S.vcSort.length ? S.vcSort : [{k:'mcap',d:-1}];
+  rows.sort((a,b)=>{
+    for(const s of sorts){
+      let x = vval(a,s.k), y = vval(b,s.k);
+      if(typeof x === 'string' || typeof y === 'string'){
+        const c = String(x||'').localeCompare(String(y||''),'ko');
+        if(c) return c * s.d;
+        continue;
+      }
+      x = (x===null||x===undefined) ? -Infinity : x;
+      y = (y===null||y===undefined) ? -Infinity : y;
+      if(x!==y) return (x-y) * s.d;
+    }
+    return 0;
+  });
+
+  const head = VCOLS.map(c=>{
+    const i = sorts.findIndex(s=>s.k===c.k);
+    const mark = i<0 ? '' : `<span class="sm">${sorts[i].d<0?'▼':'▲'}${sorts.length>1?i+1:''}</span>`;
+    return `<th data-k="${c.k}" style="width:${c.w}px" class="${i>=0?'on':''}">${c.h}${mark}</th>`;
+  }).join('');
+
+  const body = rows.map(r=>{
+    const tds = VCOLS.map(c=>{
+      const raw = vval(r,c.k);
+      let cls = c.cls||''; if(c.sans) cls += ' sans';
+      let style = '';
+      if(c.band && raw!==null && raw!==undefined){
+        const b = c.band(raw);
+        if(b==='g') style = 'background:#0E3A2B;color:#7FE0B4';
+        else if(b==='r') style = 'background:#37191A;color:#EE9089';
+      }else if(c.tone && raw!==null && raw!==undefined){
+        const t = c.tone(raw);
+        if(t==='pos') style = 'color:var(--buy)';
+        else if(t==='neg') style = 'color:var(--sell)';
+      }
+      if(c.k==='t') style = `color:${r._b.color};font-weight:700`;
+      return `<td class="${cls}" style="${style}">${c.fmt(r)}</td>`;
+    }).join('');
+    return `<tr data-t="${r.t}">${tds}</tr>`;
+  }).join('');
+
+  document.getElementById('vcTable').innerHTML =
+    `<thead><tr>${head}</tr></thead><tbody>${body}</tbody>`;
+
+  document.querySelectorAll('#vcTable th').forEach(th=>{
+    th.onclick = e => {
+      const k = th.dataset.k;
+      let list = (S.vcSort||[]).slice();
+      const i = list.findIndex(s=>s.k===k);
+      if(!e.shiftKey){
+        list = i>=0 && list.length===1
+          ? (list[0].d===-1 ? [{k,d:1}] : [])
+          : [{k,d:-1}];
+      }else{
+        if(i>=0) list[i] = {k, d: list[i].d===-1?1:-1};
+        else list.push({k,d:-1});
+      }
+      S.vcSort = list; save(); render();
+    };
+  });
+  document.querySelectorAll('#vcTable tbody tr').forEach(tr=>{
+    tr.onclick = () => { S.dtPick = tr.dataset.t; switchView('detail'); };
+  });
 }
 
 /* --- 밸류 비교 --- */
 function renderValue(all){
+  const mode = S.vcMode || 'table';
+  const nav = document.getElementById('vcMode');
+  if(nav){
+    nav.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.m===mode));
+    if(!nav.dataset.wired){
+      nav.dataset.wired='1';
+      nav.querySelectorAll('button').forEach(b=>{
+        b.onclick = () => { S.vcMode = b.dataset.m; save(); render(); };
+      });
+    }
+  }
+  document.getElementById('vcTableBox').hidden = mode!=='table';
+  document.getElementById('vcPlotBox').hidden  = mode!=='plot';
+  document.getElementById('vcAxes').hidden     = mode!=='plot';
   const opts = sel => METRICS.map(m=>`<option value="${m.k}"${m.k===sel?' selected':''}>${m.h}</option>`).join('');
   const gx=document.getElementById('vcX'), gy=document.getElementById('vcY'), gt=document.getElementById('vcTheme');
   gx.innerHTML = opts(S.vcX); gy.innerHTML = opts(S.vcY);
@@ -1195,6 +1731,14 @@ function renderValue(all){
   gx.onchange = e=>{ S.vcX=e.target.value; render(); };
   gy.onchange = e=>{ S.vcY=e.target.value; render(); };
   gt.onchange = e=>{ S.vcTheme=e.target.value; render(); };
+
+  // 테마 옵션은 전체 목록에서 만들고, 표시는 걸러진 목록으로 합니다.
+  const shown = all.filter(r=>!S.vcTheme || r.theme===S.vcTheme);
+  document.getElementById('vcHint').textContent = mode==='table'
+    ? `${shown.length}개 종목 · ${VCOLS.length}개 지표`
+    : '원 크기 = 시가총액 · 색 = 판단';
+
+  if(mode==='table'){ renderValueTable(shown); return; }
 
   const mx=M(S.vcX), my=M(S.vcY);
   const val = (r,k) => k==='perGap' ? effPerGap(r) : (k==='score' ? r.score : num(r[k]));

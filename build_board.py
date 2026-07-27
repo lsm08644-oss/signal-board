@@ -62,6 +62,10 @@ def to_board_row(rec):
     for src, key in FIELD_MAP.items():
         v = rec.get(src)
         out[key] = v if v is not None else None
+    if rec.get("_detail"):
+        out["d"] = rec["_detail"]      # 상세 탭 전용
+    if rec.get("_valu"):
+        out["v"] = rec["_valu"]        # 밸류 비교 표 전용
     return out
 
 
@@ -139,6 +143,7 @@ def main():
     payload = {
         "rows": rows,
         "market": market,
+        "indices": mkt.get("_indices") or {},
         "asOf": now.strftime("%m.%d %H:%M"),
         "asOfISO": now.isoformat(timespec="seconds"),
     }
